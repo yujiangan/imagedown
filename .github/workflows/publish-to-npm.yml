@@ -7,22 +7,22 @@ on:
 
 jobs:
   publish-to-npm:
-    runs-on: ubuntu-latest   
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
       - name: Setup Node.js and npmrc
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'   
-          registry-url: 'https://registry.npmjs.org'   
-          scope: '@yujianan/imagedown'   
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@yujianan/imagedown"
 
       - name: Install dependencies
         run: npm ci
@@ -30,20 +30,20 @@ jobs:
       - name: Configure Git user
         run: |
           git config --global user.name "github-actions[bot]"   
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"   
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version and generate CHANGELOG
         run: npx standard-version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push version changes
         run: |
-          git push --follow-tags origin dev
+          git push --follow-tags origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm registry
-        run: npm publish --provenance --access public   
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
