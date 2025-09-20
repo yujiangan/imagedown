@@ -1,12 +1,12 @@
 {
   "name": "@yujiangan/imagedown",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "爬虫 CLI 程序",
   "main": "dist/index.js",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yujiangan/imagedown.git"   
+    "url": "https://github.com/yujiangan/imagedown.git"
   },
   "files": [
     "dist",
