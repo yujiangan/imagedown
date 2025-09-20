@@ -4,7 +4,6 @@ import { hideBin } from 'yargs/helpers';
 import fs from 'node:fs/promises';
 import path from 'node:path'; 
 import { concurrentTask } from './concurrentDownload.js';
-import { log } from 'node:console';
  
 
 const argv = yargs(hideBin(process.argv))
