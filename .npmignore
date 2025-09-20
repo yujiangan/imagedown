@@ -1,0 +1,10 @@
+# 忽略编辑器配置
+.vscode/
+# 忽略测试/下载的图片文件夹
+imagescls/
+# 忽略 TypeScript 源码（只保留编译后的 dist）
+src/
+# 忽略日志文件
+*.log
+# 忽略 node_modules（用户安装时会自动下载依赖，无需包含）
+node_modules/
