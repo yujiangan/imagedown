@@ -6,7 +6,7 @@ import path from 'node:path';
 import { concurrentTask } from './concurrentDownload.js';
  
 
-const argv = yargs(hideBin(process.argv))
+yargs(hideBin(process.argv))
   .usage('Usage: imagedown [--concurrency N] <url> <folder> \n下载指定网页中的图片到本地文件夹')
   .command(
     '$0 <url> <folder>',
@@ -35,22 +35,24 @@ const argv = yargs(hideBin(process.argv))
             return value;
         },
       })
+    },
+    async (argv) => {
 
-    })
+        const { url , folder, concurrency } = argv;
+        
+        console.log(`Target URL: ${url}`);
+        console.log(`Save folder: ${folder}`);
+        console.log(`Concurrency: ${concurrency}`);
+        
+        await main(url, folder, concurrency);
+    }
+  )
   
   .help()
   .alias('h', 'help')
   .showHelpOnFail(true)
   .strict()
   .parse()
-
- const { url, folder, concurrency } = argv;
- 
-
-// 提示信息
-console.log(`Target URL: ${url}`);
-console.log(`Save folder: ${folder}`);
-console.log(`Concurrency: ${concurrency}`);
 
 // 使用fetch获取HTML
 async function downloadHTML(url: string)  {
@@ -145,8 +147,8 @@ async function downloadImage(url: string, folder: string, index: number, total: 
 
 
 // 主逻辑
- 
-try {
+async function main(url: string, folder: string, concurrency: number) {
+  try {
   // 确保保存目录存在
   await ensureDirectoryExists(folder);
   // 下载 HTML
@@ -162,7 +164,8 @@ try {
     await downloadImage(task, folder, index , total);
   });
   console.log('All images downloaded.');
-} catch (err) {
+  } catch (err) {
   console.error('Error:', (err as Error).message);
   process.exit(1);
-}
+  }
+} 
