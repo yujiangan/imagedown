@@ -4,6 +4,10 @@
   "description": "爬虫 CLI 程序",
   "main": "dist/index.js",
   "type": "module",
+  "files":[
+    "dist",
+    "bin" 
+  ],
   "bin": {
     "imagedown": "bin/index.js"
   },
@@ -17,7 +21,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.5.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "dependencies": {

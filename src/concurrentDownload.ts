@@ -1,7 +1,7 @@
 export async function concurrentTask<T>(
   tasks: T[],  
   concurrency: number,
-  callback: (task: T, total: number, displayIndex: number) => Promise<void>
+  callback: (task: T, total: number, index: number) => Promise<void>
 ): Promise<void> {
   const taskQueue = [...tasks.keys()];
   const total = taskQueue.length;

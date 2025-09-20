@@ -2,8 +2,9 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import fs from 'node:fs/promises';
-import * as path from 'node:path';
+import path from 'node:path'; 
 import { concurrentTask } from './concurrentDownload.js';
+import { log } from 'node:console';
  
 
 const argv = yargs(hideBin(process.argv))
@@ -44,16 +45,13 @@ const argv = yargs(hideBin(process.argv))
   .strict()
   .parse()
 
- 
-
-const url = argv.url;
-const folder = argv.folder;
+ const { url, folder, concurrency } = argv;
  
 
 // 提示信息
 console.log(`Target URL: ${url}`);
 console.log(`Save folder: ${folder}`);
-console.log(`Concurrency: ${argv.concurrency}`);
+console.log(`Concurrency: ${concurrency}`);
 
 // 使用fetch获取HTML
 async function downloadHTML(url: string)  {
@@ -67,13 +65,15 @@ async function downloadHTML(url: string)  {
 // 根据正则表达式提取图片链接 
 function extractImageURLs(html: string, baseURL: string) {
   const imgRegex = /<img[^>]+src=["']([^"'>]+)["'][^>]*>/gi;
-  const matchs = html.match(imgRegex) || [];
+  const matchs = html.matchAll(imgRegex); 
+  const resultArray = [...matchs];
+  
   
   const urls:string[] = [];
-  for (const match of matchs) {
-    const src = match.match(/src=["']([^"'>]+)["']/i)
+  for (const match of resultArray) {
+    const src = match[1]
     if (src) {
-      urls.push(new URL(src[1], baseURL).href)
+      urls.push(new URL(src, baseURL).href)
     } 
   }
   
@@ -95,7 +95,7 @@ async function ensureDirectoryExists(folder: string) {
 // 下载图片
 async function downloadImage(url: string, folder: string, index: number, total: number) {
   
-  try {
+  try{
     console.log(`(${index}/${total}) downloading ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
@@ -126,47 +126,44 @@ async function downloadImage(url: string, folder: string, index: number, total: 
     if (!ext || !validExtensions.includes(ext)) {
       ext = path.extname(url).toLowerCase();
     }
-    
+
     // 确保扩展名有效，如果无效则使用默认值
     if (!ext || !validExtensions.includes(ext)) {
       ext = '.jpg';
-    }
-    
+     
     const arrayBuffer = await response.arrayBuffer();
     const imageBuffer = Buffer.from(arrayBuffer);
     
     const customFilename = `image_${index}${ext}`;
     const filepath = path.join(folder, customFilename);
     await fs.writeFile(filepath, imageBuffer);
+    }
   } catch (err) {
     console.error(`处理 ${url} 出错:`, (err as Error).message);
     throw err;  
   }
 }
 
+
 // 主逻辑
  
-  try {
-    // 确保保存目录存在
-    await ensureDirectoryExists(folder);
-    // 下载 HTML
-    const html = await downloadHTML(url);
-    // 提取图片链接
-    const imageUrls = extractImageURLs(html, url);
-    console.log('imageUrls:', imageUrls);
-    console.log(`extracted ${imageUrls.length} images from html  images:`);
-    console.log('downloading images...');
-
-    // 创建文件夹
-    ensureDirectoryExists(folder);
-
-    // 并发下载图片
-    await concurrentTask(imageUrls, argv.concurrency, async (task, total, index) => {
-      await downloadImage(task, folder, index , total);
-    });
-
-    console.log('All images downloaded.');
-  } catch (err) {
-    console.error('Error:', (err as Error).message);
-    process.exit(1);
-  }
+try {
+  // 确保保存目录存在
+  await ensureDirectoryExists(folder);
+  // 下载 HTML
+  const html = await downloadHTML(url);
+  // 提取图片链接
+  const imageUrls = extractImageURLs(html, url);
+  console.log('imageUrls:', imageUrls);
+  console.log(`extracted ${imageUrls.length} images from html`);
+  console.log('downloading images...');
+   
+  // 并发下载图片
+  await concurrentTask(imageUrls, concurrency, async (task, total, index) => {
+    await downloadImage(task, folder, index , total);
+  });
+  console.log('All images downloaded.');
+} catch (err) {
+  console.error('Error:', (err as Error).message);
+  process.exit(1);
+}
