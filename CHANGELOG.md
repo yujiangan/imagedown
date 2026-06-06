@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.6](https://github.com/yujiangan/imagedown/compare/v1.0.5...v1.0.6) (2026-06-06)
+
+
+### Bug Fixes
+
+* 修复图片下载逻辑并完善README文档 ([3751c39](https://github.com/yujiangan/imagedown/commit/3751c392120f0fc826e23bc1771b00b5e1f8848b))
+
 ### [1.0.5](https://github.com/yujiangan/imagedown/compare/v1.0.4...v1.0.5) (2025-09-20)
 
 ### [1.0.4](https://github.com/yujiangan/imagedown/compare/v1.0.3...v1.0.4) (2025-09-20)
