@@ -56,7 +56,13 @@ yargs(hideBin(process.argv))
 
 // 使用fetch获取HTML
 async function downloadHTML(url: string)  {
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+    }
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch HTML: ${response.statusText}`);
   }
@@ -98,7 +104,12 @@ async function downloadImage(url: string, folder: string, index: number, total: 
   
   try{
     console.log(`(${index}/${total}) downloading ${url}`);
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': url
+      }
+    });
     if (!response.ok) {
       throw new Error(`下载失败: ${url}`);
     }
@@ -131,6 +142,7 @@ async function downloadImage(url: string, folder: string, index: number, total: 
     // 确保扩展名有效，如果无效则使用默认值
     if (!ext || !validExtensions.includes(ext)) {
       ext = '.jpg';
+    }
      
     const arrayBuffer = await response.arrayBuffer();
     const imageBuffer = Buffer.from(arrayBuffer);
@@ -138,7 +150,6 @@ async function downloadImage(url: string, folder: string, index: number, total: 
     const customFilename = `image_${index}${ext}`;
     const filepath = path.join(folder, customFilename);
     await fs.writeFile(filepath, imageBuffer);
-    }
   } catch (err) {
     console.error(`处理 ${url} 出错:`, (err as Error).message);
     throw err;  
